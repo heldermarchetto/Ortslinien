@@ -212,13 +212,13 @@ const GLOSS = {
   'Parallelenpaar': 'pair of parallel lines', 'Parallelen': 'parallel lines', 'Parallele': 'parallel line', 'parallel': 'parallel',
   'Schnittpunkte': 'points of intersection', 'Schnittpunkt': 'point of intersection',
   'Geraden': 'straight line(s)', 'Gerade': 'straight line', 'Halbgerade': 'ray', 'Strecke': 'line segment',
-  'Kreise': 'circles', 'Kreis': 'circle', 'Radius': 'radius', 'Zirkel': 'compass', 'Lineal': 'ruler', 'Geodreieck': 'set square',
+  'Kreise': 'circles', 'Kreis': 'circle', 'Radius': 'radius', 'Zirkel': 'compasses', 'Lineal': 'ruler', 'Geodreieck': 'set square',
   'Senkrechte': 'perpendicular line', 'senkrecht': 'perpendicular (at 90°)', 'Schenkeln': 'arms of the angle', 'Schenkel': 'arm of an angle',
   'Winkel': 'angle', 'Dreiecke': 'triangles', 'Dreieck': 'triangle', 'Seite': 'side', 'Höhe': 'height (altitude)',
   'Eigenschaft': 'property', 'schneiden sich': 'intersect', 'schneidet': 'intersects', 'deckungsgleich': 'congruent (same shape and size)',
   'Konstruktionsbeschreibung': 'description of the construction', 'Bedingungen': 'conditions', 'Bedingung': 'condition',
   'Mitte': 'middle / midpoint', 'gegenüber': 'opposite', 'Schatz': 'treasure', 'Reihenfolge': 'order', 'Hälfte': 'half',
-  'Konstruiere': 'construct (draw exactly with compass and ruler)', 'Markiere': 'mark', 'Bestimme': 'determine / find', 'Beschreibe': 'describe',
+  'Konstruiere': 'construct (draw exactly with compasses and ruler)', 'Markiere': 'mark', 'Bestimme': 'determine / find', 'Beschreibe': 'describe',
   'Verbinde': 'connect', 'Stelle': 'set', 'weniger als': 'less than', 'Inneren': 'inside', 'Lösung': 'solution'
 };
 const GLRE = new RegExp('(^|[^A-Za-zÄÖÜäöüß])(' + Object.keys(GLOSS).sort((a, b) => b.length - a.length).join('|') + ')(?![A-Za-zÄÖÜäöüß])', 'g');
@@ -572,7 +572,7 @@ const VOCAB = [
   { w: 'Radius', art: 'der', en: 'radius', ic: 'radius', def: 'Der Abstand vom Mittelpunkt zum Kreis.' },
   { w: 'Gerade', art: 'die', en: 'straight line', ic: 'gerade', def: 'Eine gerade Linie ohne Anfang und ohne Ende.' },
   { w: 'Strecke', art: 'die', en: 'line segment', ic: 'strecke', def: 'Eine gerade Linie mit Anfang und Ende.' },
-  { w: 'Zirkel', art: 'der', en: 'compass', ic: 'zirkel', def: 'Mit diesem Werkzeug zeichnest du Kreise.' },
+  { w: 'Zirkel', art: 'der', en: 'compasses', ic: 'zirkel', def: 'Mit diesem Werkzeug zeichnest du Kreise.' },
   { w: 'Parallele', art: 'die', en: 'parallel line', syl: ['Pa', 'ral', 'le', 'le'], ic: 'parallele', def: 'Zwei Parallelen haben überall den gleichen Abstand. Sie schneiden sich nie.' },
   { w: 'Dreieck', art: 'das', en: 'triangle', ic: 'dreieck', def: 'Eine Figur mit drei Ecken und drei Seiten.' },
   { w: 'Winkel', art: 'der', en: 'angle', ic: 'winkel', def: 'Zwei Schenkel treffen sich in einem Punkt.' },
@@ -898,7 +898,7 @@ function sorter(host, intro, steps, done) {
 }
 const S_CONSTR = {
   id: 'K', title: 'Konstruieren', icon: '📏', sub: 'Mit Zirkel und Lineal – Schritt für Schritt',
-  intro: '<b>Konstruiere</b> bedeutet: Zeichne genau mit Zirkel und Lineal (oder Geodreieck). <span class="en">Construct = draw exactly with compass and ruler.</span><br>Hier konstruierst du Schritt für Schritt. Rechts entsteht deine Konstruktionsbeschreibung. Danach konstruierst du alles noch einmal <b>im Heft</b>.',
+  intro: '<b>Konstruiere</b> bedeutet: Zeichne genau mit Zirkel und Lineal (oder Geodreieck). <span class="en">Construct = draw exactly with compasses and ruler.</span><br>Hier konstruierst du Schritt für Schritt. Rechts entsteht deine Konstruktionsbeschreibung. Danach konstruierst du alles noch einmal <b>im Heft</b>.',
   tasks: [
     { id: 'K1', title: 'Die Mittelsenkrechte konstruieren', sub: 'zwei Kreise – zwei Schnittpunkte – eine Gerade', run: (h, d) => runSteps(h, K_MS, d) },
     { id: 'K2', title: 'Mittelsenkrechte: Schritte ordnen', sub: 'Bringe die Sätze in die richtige Reihenfolge.', run: (h, d) => sorter(h, '<b>Konstruktionsbeschreibung: Mittelsenkrechte von AB.</b> Bringe die Schritte in die richtige Reihenfolge. Benutze ▲ und ▼.', ['Ich stelle den Zirkel ein. Der Radius ist größer als die Hälfte von AB.', 'Ich zeichne einen Kreis um A.', 'Ich zeichne mit dem gleichen Radius einen Kreis um B.', 'Die zwei Kreise schneiden sich in zwei Punkten.', 'Ich zeichne die Gerade durch die zwei Schnittpunkte.'], d) },
