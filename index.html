@@ -480,7 +480,13 @@ function Board(host, W, H) {
     dot(p, label, cls = '', off, tcls = '') { const e = S('circle', { cx: p.x * U, cy: p.y * U, r: 11, class: 'dot ' + cls }, L.pts); if (label) b.text(V.add(p, off || { x: .22, y: -.22 }), label, tcls); return e; },
     text(p, str, cls = '', ly = 'lab') { const t = S('text', { x: p.x * U, y: p.y * U, class: 'h ' + cls }, L[ly]); t.innerHTML = str; return t; },
     hot(p, ly = 'hot') { return S('circle', { cx: p.x * U, cy: p.y * U, r: 46, class: 'hot' }, L[ly]); },
-    rightAngle(p, d1, d2, ly = 'aux') { const u = V.mul(V.unit(d1), .3), v = V.mul(V.unit(d2), .3), a = V.add(p, u), c = V.add(a, v), d = V.add(p, v); return S('polyline', { points: [a, c, d].map(q => q.x * U + ',' + q.y * U).join(' '), class: 'thin' }, L[ly]); },
+    rightAngle(p, d1, d2, ly = 'aux') { // rechter Winkel: Viertelkreis mit Punkt (deutsche Schreibweise)
+      const r = .38, u = V.unit(d1), v = V.unit(d2), a = V.add(p, V.mul(u, r)), c = V.add(p, V.mul(v, r)), sweep = V.cross(u, v) > 0 ? 1 : 0;
+      const m = V.add(p, V.mul(V.unit(V.add(u, v)), r * .45)), g = S('g', {}, L[ly]);
+      S('path', { d: `M${a.x * U} ${a.y * U} A${r * U} ${r * U} 0 0 ${sweep} ${c.x * U} ${c.y * U}`, class: 'thin' }, g);
+      S('circle', { cx: m.x * U, cy: m.y * U, r: 5.5, style: 'fill:#8793a0;stroke:none' }, g);
+      return g;
+    },
     arc(c, r, a0, a1, cls = 'thin', ly = 'aux') { // Winkel in Grad, mathematisch (gegen den Uhrzeigersinn)
       const p0 = V.add(c, V.mul(V.ang(a0), r)), p1 = V.add(c, V.mul(V.ang(a1), r)), big = Math.abs(a1 - a0) > 180 ? 1 : 0;
       return S('path', { d: `M${p0.x * U} ${p0.y * U} A${r * U} ${r * U} 0 ${big} ${a1 > a0 ? 0 : 1} ${p1.x * U} ${p1.y * U}`, class: cls }, L[ly]);
@@ -545,8 +551,8 @@ const tx = (x, y, t, c = '#22303c') => `<text x="${x}" y="${y}" font-size="13" f
 const dt = (x, y, c = '#22303c') => `<circle cx="${x}" cy="${y}" r="3.2" fill="${c}" stroke="none"/>`;
 const ICON = {
   ortslinie: IC(`<path d="M10 70 Q60 0 110 70" stroke="#1c6fd1" stroke-dasharray="1 6"/>` + [[20, 57.4], [40, 40.6], [60, 35], [80, 40.6], [100, 57.4]].map(p => dt(p[0], p[1], '#1c6fd1')).join('')),
-  abstand: IC(`<path d="M10 70H110"/><path d="M60 22V70" stroke="#d6336c" stroke-dasharray="4 4"/><path d="M60 62h8v8"/>` + dt(60, 22) + tx(66, 20, 'P') + tx(44, 50, 'd', '#d6336c') + tx(100, 84, 'g')),
-  ms: IC(`<path d="M20 60H100"/><path d="M60 8V86" stroke="#d6336c"/><path d="M60 52h8v8"/>` + dt(20, 60) + dt(100, 60) + tx(14, 78, 'A') + tx(98, 78, 'B')),
+  abstand: IC(`<path d="M10 70H110"/><path d="M60 22V70" stroke="#d6336c" stroke-dasharray="4 4"/><path d="M60 60A10 10 0 0 1 70 70" stroke-width="1.6"/>` + dt(63.2, 66.8, '#22303c').replace('r="3.2"', 'r="1.6"') + `` + dt(60, 22) + tx(66, 20, 'P') + tx(44, 50, 'd', '#d6336c') + tx(100, 84, 'g')),
+  ms: IC(`<path d="M20 60H100"/><path d="M60 8V86" stroke="#d6336c"/><path d="M60 50A10 10 0 0 1 70 60" stroke-width="1.6"/>` + dt(63.2, 56.8, '#22303c').replace('r="3.2"', 'r="1.6"') + `` + dt(20, 60) + dt(100, 60) + tx(14, 78, 'A') + tx(98, 78, 'B')),
   wh: IC(`<path d="M15 75H110M15 75L95 15"/><path d="M15 75L108 44" stroke="#2f9e44"/><path d="M50 75A35 35 0 0 0 43 54" stroke-width="1.5"/>` + dt(15, 75)),
   mp: IC(`<path d="M8 20H112M8 70H112"/><path d="M8 45H112" stroke="#e8590c" stroke-dasharray="6 5"/>` + tx(100, 15, 'g') + tx(100, 85, 'h')),
   schnittpunkt: IC(`<path d="M15 75L105 15M15 20L105 70"/>` + dt(60, 45, '#d6336c') + tx(56, 34, 'S', '#d6336c')),
@@ -555,7 +561,7 @@ const ICON = {
   gerade: IC(`<path d="M2 68L118 22"/>` + tx(96, 22, 'g')),
   strecke: IC(`<path d="M25 62L95 30"/>` + dt(25, 62) + dt(95, 30) + tx(14, 80, 'A') + tx(98, 26, 'B')),
   zirkel: IC(`<path d="M60 14L40 80M60 14L80 80"/><circle cx="60" cy="11" r="4"/><path d="M66 84Q80 88 92 80" stroke="#1c6fd1" stroke-dasharray="3 3"/>`),
-  senkrecht: IC(`<path d="M12 70H108M60 12V70"/><path d="M60 60h10v10" stroke="#d6336c"/>` + dt(66, 65.5, '#d6336c')),
+  senkrecht: IC(`<path d="M12 70H108M60 12V70"/><path d="M60 56A14 14 0 0 1 74 70" stroke="#d6336c"/>` + dt(64.5, 65.5, '#d6336c').replace('r="3.2"', 'r="2.2"')),
   dreieck: IC(`<path d="M15 75H105L70 15Z"/>` + tx(6, 88, 'A') + tx(104, 88, 'B') + tx(66, 11, 'C')),
   winkel: IC(`<path d="M15 75H110M15 75L95 20"/><path d="M55 75A40 40 0 0 0 48 52" stroke="#d6336c"/>` + tx(36, 70, 'α', '#d6336c')),
   parallele: IC(`<path d="M10 60L110 30M10 82L110 52"/>` + tx(54, 62, '∥', '#d6336c')),
@@ -778,7 +784,7 @@ const EX = (() => {
       measure: P => [{ n: 'Abstand von g', v: dLine(P, g3) }], ok: P => Math.abs(dLine(P, g3) - 2) < .2, snap: P => V.add(proj(P, g3), V.mul(V.perp(g3.d), 2 * Math.sign(sdLine(P, g3)))),
       group: P => Math.sign(sdLine(P, g3)), groupHint: 'Gut! Suche jetzt auch Punkte auf der <b>anderen Seite</b> von g.', hint: 'Der Abstand von g ist noch nicht 2&nbsp;cm.',
       reveal(b) { b.line(shift(g3, 2), 'par', 'loc', true); b.line(shift(g3, -2), 'par', 'loc', true); },
-      merk: 'Alle Punkte mit dem Abstand d von einer Geraden g liegen auf <b>zwei Parallelen</b> zu g (ein Parallelenpaar). Eine Parallele liegt auf jeder Seite von g.',
+      merk: 'Alle Punkte mit dem Abstand d von einer Geraden g liegen auf <b>zwei Parallelen</b> zu g (auf einem Parallelenpaar). Eine Parallele liegt auf jeder Seite von g.',
       quiz: { q: 'Wie viele Parallelen zu g haben den Abstand 2&nbsp;cm von g?', o: [{ t: 'zwei – eine auf jeder Seite', ok: true }, { t: 'eine', fb: 'Schau noch einmal auf das Bild: Es gibt zwei Seiten.' }, { t: 'unendlich viele', fb: 'Nein. Der Abstand ist genau 2 cm.' }] }
     },
     mp: {
@@ -912,7 +918,7 @@ const S_CONSTR = {
 /* =====================================================================
    STATION 4 – SCHATZSUCHE: ZWEI ORTSLINIEN KOMBINIEREN
    ===================================================================== */
-const LO = { kreis: 'ein <b>Kreis</b>', ms: 'die <b>Mittelsenkrechte</b>', wh: 'die zwei <b>Winkelhalbierenden</b>', mp: 'die <b>Mittelparallele</b>', par: 'zwei <b>Parallelen</b> (Parallelenpaar)' };
+const LO = { kreis: 'auf einem <b>Kreis</b>', ms: 'auf der <b>Mittelsenkrechten</b>', wh: 'auf den zwei <b>Winkelhalbierenden</b>', mp: 'auf der <b>Mittelparallelen</b>', par: 'auf zwei <b>Parallelen</b> (auf einem Parallelenpaar)' };
 function gen(make) { for (let i = 0; i < 500; i++) { const s = make(); if (s) return s; } return make.fallback(); }
 const apart = pts => pts.every((p, i) => pts.every((q, j) => i === j || V.dist(p, q) > 1));
 const B14 = { W: 14, H: 9, inside: (p, m = .5) => p.x > m && p.y > m && p.x < 14 - m && p.y < 9 - m };
@@ -1155,7 +1161,7 @@ const POOL = [
   ['Welches Wort ist richtig geschrieben?', 'Winkelhalbierende', 'Winkelhalbirende', 'Winkelhalbierente', 'Winckelhalbierende'],
   ['Welche Punkte haben von C <b>weniger als</b> 2 cm Abstand?', 'die Punkte im Inneren des Kreises um C mit r = 2 cm', 'die Punkte auf dem Kreis um C mit r = 2 cm', 'die Punkte außerhalb des Kreises um C'],
   ['Was ist eine Ortslinie?', 'eine Linie aus allen Punkten mit der gleichen Eigenschaft', 'eine Linie mit dem Lineal', 'ein Punkt mit einem festen Ort'],
-  ['A und B haben den Abstand 4 cm. Wie viele Punkte haben von A den Abstand 3 cm und von B den Abstand 2 cm?', 'zwei Punkte', 'einen Punkt', 'keinen Punkt'],
+  ['A und B haben den Abstand 4 cm. Wie viele Punkte haben von A den Abstand 3 cm und von B den Abstand 2 cm?', 'zwei Punkte', 'ein Punkt', 'kein Punkt'],
   ['Welcher Artikel ist richtig?', 'der Abstand', 'die Abstand', 'das Abstand'],
   ['Der Operator „Konstruiere“ bedeutet:', 'Zeichne genau mit Zirkel und Lineal.', 'Zeichne schnell eine Skizze.', 'Schreibe einen Text.'],
   ['Du brauchst alle Punkte, die von A und B gleich weit entfernt sind und von C den Abstand 2 cm haben. Was zeichnest du?', 'die Mittelsenkrechte von AB und einen Kreis um C', 'die Winkelhalbierende und einen Kreis um A', 'zwei Kreise um A und B'],
